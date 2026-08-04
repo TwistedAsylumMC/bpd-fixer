@@ -1,0 +1,30 @@
+{
+  "name": "bpd-fixer",
+  "version": "0.1.0",
+  "description": "Produces corrected copies of Mojang's Bedrock protocol JSON schemas, fixing required/optional mistakes, wire-encoding quirks, and unclear names.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TwistedAsylumMC/bpd-fixer.git"
+  },
+  "type": "module",
+  "bin": {
+    "bpd-fixer": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:schemas": "tsx src/index.ts",
+    "check": "tsx src/index.ts --check",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "lossless-json": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

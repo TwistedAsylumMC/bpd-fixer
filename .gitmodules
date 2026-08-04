@@ -1,0 +1,3 @@
+[submodule "vendor/bedrock-protocol-docs"]
+	path = vendor/bedrock-protocol-docs
+	url = https://github.com/Mojang/bedrock-protocol-docs.git

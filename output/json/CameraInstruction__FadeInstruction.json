@@ -16,8 +16,5 @@
             "x-ordinal-index": 0
         }
     },
-    "required": [
-        "Color",
-        "Time"
-    ]
+    "required": []
 }

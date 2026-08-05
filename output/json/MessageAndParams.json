@@ -39,6 +39,8 @@
         }
     },
     "required": [
-        "Message Type"
+        "Message",
+        "Message Type",
+        "Parameter List"
     ]
 }

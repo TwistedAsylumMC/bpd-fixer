@@ -13,6 +13,9 @@
             "items": {
                 "$ref": "./InventoryAction.json"
             },
+            "x-serialization-options": [
+                "+always-set-optional"
+            ],
             "x-ordinal-index": 0,
             "x-runtime-constraint-description": "Verify that the number of InventoryActions does not exceed 100"
         }

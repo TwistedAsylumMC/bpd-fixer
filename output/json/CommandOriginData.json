@@ -40,6 +40,8 @@
         }
     },
     "required": [
+        "PlayerId",
+        "RequestId",
         "Type",
         "UUID"
     ]

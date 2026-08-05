@@ -18,7 +18,7 @@
         },
         "Target Mode": {
             "$ref": "./Aim-Assist_Target_Mode.json",
-            "x-underlying-type": "uint8",
+            "x-underlying-type": "int32",
             "x-serialization-options": [
                 "Enum-as-Value"
             ],
@@ -29,10 +29,5 @@
             "x-ordinal-index": 2
         }
     },
-    "required": [
-        "Distance",
-        "Preset Id",
-        "Target Mode",
-        "View Angle"
-    ]
+    "required": []
 }

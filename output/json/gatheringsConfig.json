@@ -64,11 +64,6 @@
     "required": [
         "creatorId",
         "experienceId",
-        "experienceName",
-        "scenarioId",
-        "serverId",
-        "targetId",
-        "worldId",
-        "worldName"
+        "experienceName"
     ]
 }

@@ -55,8 +55,10 @@
     },
     "required": [
         "curve",
+        "loadFromJson",
         "progressKeyFrames",
         "rotationOption",
+        "splineIdentifier",
         "totalTime",
         "type"
     ]

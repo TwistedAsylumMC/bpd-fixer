@@ -54,6 +54,10 @@
         }
     },
     "required": [
-        "Text"
+        "DepthTest",
+        "ShowBackface",
+        "ShowTextBackface",
+        "Text",
+        "UseRotation"
     ]
 }

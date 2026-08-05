@@ -33,10 +33,5 @@
             "maximum": 255.0
         }
     },
-    "required": [
-        "Arrow End Location",
-        "Arrow Head Length",
-        "Arrow Head Radius",
-        "Num Segments"
-    ]
+    "required": []
 }

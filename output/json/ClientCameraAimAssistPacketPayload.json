@@ -28,6 +28,7 @@
     },
     "required": [
         "Action",
+        "Allow aim assist",
         "Camera Preset Id"
     ]
 }

@@ -39,10 +39,7 @@
                     "$ref": "./BlockCommandData.json"
                 }
             ],
-            "x-control-value-type": "uint32",
-            "x-serialization-options": [
-                "Compression"
-            ],
+            "x-control-value-type": "boolean",
             "x-ordinal-index": 0
         },
         "Tick Delay": {

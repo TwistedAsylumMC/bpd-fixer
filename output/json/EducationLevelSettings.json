@@ -53,13 +53,10 @@
     },
     "required": [
         "(Deprecated) Always False",
-        "Agent Capabilities",
         "Can resize Code Builder",
         "Code Builder Default URI",
         "Code Builder Title",
         "Disable legacy title bar",
-        "External Link Settings",
-        "Local Settings",
         "Post Process Filter",
         "Screenshot Border Resource Path"
     ]

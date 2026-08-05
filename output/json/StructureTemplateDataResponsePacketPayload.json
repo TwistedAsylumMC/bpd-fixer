@@ -25,7 +25,6 @@
     },
     "required": [
         "Response Type",
-        "Structure Name",
-        "Structure's NBT"
+        "Structure Name"
     ]
 }

@@ -33,6 +33,7 @@
         }
     },
     "required": [
+        "Message",
         "Message Type"
     ]
 }

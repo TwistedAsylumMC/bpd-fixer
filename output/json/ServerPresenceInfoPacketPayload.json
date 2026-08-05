@@ -12,7 +12,5 @@
             "x-ordinal-index": 0
         }
     },
-    "required": [
-        "presence_configuration"
-    ]
+    "required": []
 }

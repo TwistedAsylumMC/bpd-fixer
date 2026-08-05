@@ -12,7 +12,5 @@
             "x-ordinal-index": 0
         }
     },
-    "required": [
-        "client_store_entry_point_configuration"
-    ]
+    "required": []
 }

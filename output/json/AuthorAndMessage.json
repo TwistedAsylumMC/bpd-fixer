@@ -36,6 +36,8 @@
         }
     },
     "required": [
-        "Message Type"
+        "Message",
+        "Message Type",
+        "Player Name"
     ]
 }

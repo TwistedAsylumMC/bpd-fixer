@@ -23,6 +23,7 @@
         }
     },
     "required": [
-        "CloseReason"
+        "CloseReason",
+        "FormId"
     ]
 }

@@ -25,6 +25,7 @@
         }
     },
     "required": [
-        "Name"
+        "Name",
+        "SubCommand values"
     ]
 }

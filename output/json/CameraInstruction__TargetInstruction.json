@@ -18,7 +18,6 @@
         }
     },
     "required": [
-        "Target Actor ID",
-        "Target Center Offset"
+        "Target Actor ID"
     ]
 }

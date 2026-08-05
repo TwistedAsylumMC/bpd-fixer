@@ -26,8 +26,5 @@
             "x-ordinal-index": 0
         }
     },
-    "required": [
-        "Filter Profanity Change",
-        "Graphics Mode Change"
-    ]
+    "required": []
 }

@@ -12,7 +12,5 @@
             "x-ordinal-index": 0
         }
     },
-    "required": [
-        "party_info"
-    ]
+    "required": []
 }

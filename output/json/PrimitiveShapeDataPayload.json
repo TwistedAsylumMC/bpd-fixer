@@ -113,7 +113,7 @@
         }
     },
     "required": [
-        "Dimension ID",
+        "Extra Shape Data",
         "NetworkId"
     ]
 }

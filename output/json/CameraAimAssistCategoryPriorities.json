@@ -87,5 +87,11 @@
             "default": {},
             "x-ordinal-index": 3
         }
-    }
+    },
+    "required": [
+        "block_tags",
+        "blocks",
+        "entities",
+        "entity_type_families"
+    ]
 }

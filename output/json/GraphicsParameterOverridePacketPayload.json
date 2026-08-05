@@ -66,10 +66,8 @@
     },
     "required": [
         "Biome Identifier",
-        "Float Value",
         "Identifier for Parameter",
         "Parameter Keyframe Values",
-        "Reset Parameter",
-        "Vec3 Value"
+        "Reset Parameter"
     ]
 }

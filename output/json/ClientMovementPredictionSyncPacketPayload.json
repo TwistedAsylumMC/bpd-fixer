@@ -20,8 +20,8 @@
             "x-underlying-type": "boolean",
             "x-ordinal-index": 4
         },
-        "Actor Unique ID": {
-            "$ref": "./ActorUniqueID.json",
+        "Actor Runtime ID": {
+            "$ref": "./ActorRuntimeID.json",
             "x-ordinal-index": 3
         },
         "Movement Attributes": {
@@ -33,7 +33,7 @@
         "Actor Bounding Box",
         "Actor Data Flag",
         "Actor Flying State",
-        "Actor Unique ID",
+        "Actor Runtime ID",
         "Movement Attributes"
     ]
 }

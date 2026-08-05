@@ -27,5 +27,8 @@
             "x-ordinal-index": 0,
             "maxItems": 1000
         }
-    }
+    },
+    "required": [
+        "Entries"
+    ]
 }

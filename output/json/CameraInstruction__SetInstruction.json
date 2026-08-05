@@ -49,14 +49,7 @@
         }
     },
     "required": [
-        "default",
-        "ease",
-        "entity_offset",
-        "facing",
-        "pos",
         "preset",
-        "removeIgnoreStartingValuesComponent",
-        "rot",
-        "view_offset"
+        "removeIgnoreStartingValuesComponent"
     ]
 }

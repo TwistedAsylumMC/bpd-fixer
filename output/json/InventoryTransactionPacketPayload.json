@@ -41,7 +41,8 @@
             ],
             "x-control-value-type": "uint32",
             "x-serialization-options": [
-                "Compression"
+                "Compression",
+                "+always-set-optional"
             ],
             "x-ordinal-index": 2
         }

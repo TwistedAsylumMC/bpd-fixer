@@ -119,27 +119,7 @@
         }
     },
     "required": [
-        "Aim Assist",
-        "Block Listening Radius",
-        "Continue Targeting",
-        "Control Scheme",
-        "Entity Offset",
-        "Horizontal Rotation Limit",
         "Inherit From",
-        "Listener",
-        "Name",
-        "Player Effects",
-        "Pos X",
-        "Pos Y",
-        "Pos Z",
-        "Radius",
-        "Rot X",
-        "Rot Y",
-        "Rotation Speed",
-        "Snap to Target",
-        "Vertical Rotation Limit",
-        "View Offset",
-        "Yaw Limit Max",
-        "Yaw Limit Min"
+        "Name"
     ]
 }

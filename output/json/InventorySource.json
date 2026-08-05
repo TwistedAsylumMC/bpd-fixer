@@ -13,7 +13,8 @@
             "x-underlying-type": "uint32",
             "x-serialization-options": [
                 "Compression",
-                "Enum-as-Value"
+                "Enum-as-Value",
+                "+double-optional"
             ],
             "x-ordinal-index": 2
         },
@@ -22,7 +23,8 @@
             "type": "integer",
             "x-underlying-type": "int8",
             "x-serialization-options": [
-                "Compression"
+                "Compression",
+                "+double-optional"
             ],
             "x-ordinal-index": 1,
             "minimum": -128.0,

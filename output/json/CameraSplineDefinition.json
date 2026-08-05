@@ -50,13 +50,27 @@
             "x-underlying-type": "float",
             "x-ordinal-index": 1,
             "minimum": 0.0
+        },
+        "splineIdentifier": {
+            "description": "Identifier of the spline definition.",
+            "type": "string",
+            "x-ordinal-index": 6
+        },
+        "loadFromJson": {
+            "description": "Whether the spline is loaded from JSON rather than from this packet.",
+            "type": "boolean",
+            "x-underlying-type": "boolean",
+            "x-ordinal-index": 7
         }
     },
     "required": [
         "control_points",
+        "loadFromJson",
         "name",
         "progress_key_frames",
         "rotation_key_frames",
+        "splineIdentifier",
+        "spline_type",
         "total_time"
     ]
 }

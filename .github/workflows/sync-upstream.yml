@@ -1,0 +1,273 @@
+name: sync-upstream
+
+# Mirrors Mojang/bedrock-protocol-docs branches at protocol >= 2168, building each
+# one from `main` with the submodule repointed. Upstream `main` goes through a PR
+# instead, since a protocol bump is when a stale override throws.
+#
+# Mirrors are force-pushed, but only when their tip carries the `Upstream-Commit:`
+# trailer written below — anything else is reported and left alone.
+
+on:
+  schedule:
+    # Also catches override changes: the plan compares `Fixer-Commit:` to main.
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      branch_include:
+        description: 'JS regex an upstream branch must match to be mirrored'
+        default: '.*'
+      branch_exclude:
+        description: 'JS regex an upstream branch must not match'
+        default: '^(main|master)$'
+      min_protocol:
+        description: 'Lowest x-protocol-version to mirror (the format changed at 2168)'
+        default: '2168'
+      max_new:
+        description: 'Cap on brand-new mirror branches per run (0 = no cap)'
+        default: '10'
+      force:
+        description: 'Rebuild mirrors even if they look up to date'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: https://github.com/Mojang/bedrock-protocol-docs.git
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      count: ${{ steps.plan.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          submodules: recursive
+
+      # plan-sync.mjs inspects each tip, so the commits must exist locally.
+      - name: Fetch upstream branch tips into the submodule
+        run: |
+          git -C vendor/bedrock-protocol-docs fetch --no-tags --depth=1 \
+            origin '+refs/heads/*:refs/remotes/origin/*'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - id: plan
+        run: node scripts/plan-sync.mjs
+        env:
+          TARGET_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
+          FIXER_SHA: ${{ github.sha }}
+          BRANCH_INCLUDE: ${{ inputs.branch_include || '.*' }}
+          BRANCH_EXCLUDE: ${{ inputs.branch_exclude || '^(main|master)$' }}
+          MIN_PROTOCOL: ${{ inputs.min_protocol || '2168' }}
+          MAX_NEW: ${{ inputs.max_new || '10' }}
+          FORCE: ${{ inputs.force || 'false' }}
+
+  mirror:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Point the submodule at ${{ matrix.branch }}
+        run: |
+          git -C vendor/bedrock-protocol-docs fetch --depth=1 origin "${{ matrix.upstream }}"
+          git -C vendor/bedrock-protocol-docs checkout --detach "${{ matrix.upstream }}"
+
+      # Stale overrides throw here, failing just this branch (fail-fast is off).
+      - run: npm test
+
+      - run: npm run build:schemas
+
+      - name: Commit and push the mirror
+        env:
+          BRANCH: ${{ matrix.branch }}
+        run: |
+          set -euo pipefail
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git checkout -B "$BRANCH"
+          git add -A vendor/bedrock-protocol-docs output/json
+
+          if git diff --cached --quiet; then
+            echo "No generated change for $BRANCH; nothing to push."
+            exit 0
+          fi
+
+          git commit -F - <<'MSG'
+          chore: sync docs for ${{ matrix.branch }}
+
+          Regenerated output/json from Mojang/bedrock-protocol-docs@${{ matrix.branch }}.
+
+          Upstream-Commit: ${{ matrix.upstream }}
+          Fixer-Commit: ${{ github.sha }}
+          MSG
+
+          # --force-with-lease needs a remote-tracking ref to lease against; with
+          # none the lease becomes "must not exist", which is right for a create.
+          git fetch --no-tags origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" || true
+          git push --force-with-lease origin "HEAD:refs/heads/$BRANCH"
+
+  upstream-main:
+    needs: plan
+    runs-on: ubuntu-latest
+    env:
+      PR_BRANCH: automated/upstream-main
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          submodules: recursive
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Resolve upstream default branch
+        id: upstream
+        run: |
+          set -euo pipefail
+          head_ref=$(git ls-remote --symref "$UPSTREAM_REPO" HEAD \
+            | awk '/^ref:/ {sub("refs/heads/","",$2); print $2; exit}')
+          sha=$(git ls-remote "$UPSTREAM_REPO" "refs/heads/$head_ref" | cut -f1)
+          echo "branch=$head_ref" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Point the submodule at upstream ${{ steps.upstream.outputs.branch }}
+        run: |
+          git -C vendor/bedrock-protocol-docs fetch --depth=1 origin "${{ steps.upstream.outputs.sha }}"
+          git -C vendor/bedrock-protocol-docs checkout --detach "${{ steps.upstream.outputs.sha }}"
+
+      - name: Stop early if the pointer already matches
+        id: changed
+        run: |
+          if git diff --quiet -- vendor/bedrock-protocol-docs; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify overrides still apply
+        id: verify
+        if: steps.changed.outputs.changed == 'true'
+        continue-on-error: true
+        run: npm test
+
+      - name: Open an issue if the overrides went stale
+        if: steps.changed.outputs.changed == 'true' && steps.verify.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          title="Upstream main moved and an override no longer applies"
+          existing=$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')
+          body=$(cat <<EOF
+          \`npm test\` fails with the submodule bumped to
+          \`${{ steps.upstream.outputs.branch }}\` @ \`${{ steps.upstream.outputs.sha }}\`.
+
+          An override references a field the upstream schema renamed or removed, which is the
+          intended signal to revisit it. See the failing run for which one:
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          No pull request was opened. Once the overrides are updated, re-run the workflow.
+          EOF
+          )
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body" --label upstream-sync || \
+              gh issue create --title "$title" --body "$body"
+          fi
+          exit 1
+
+      - run: npm run build:schemas
+        if: steps.changed.outputs.changed == 'true' && steps.verify.outcome == 'success'
+
+      - name: Push the branch and open or update the PR
+        if: steps.changed.outputs.changed == 'true' && steps.verify.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git checkout -B "$PR_BRANCH"
+          git add -A vendor/bedrock-protocol-docs output/json
+
+          if git diff --cached --quiet; then
+            echo "Submodule moved but nothing generated changed; nothing to propose."
+            exit 0
+          fi
+
+          git commit -F - <<'MSG'
+          chore: bump vendored docs to upstream main
+
+          Regenerated output/json from Mojang/bedrock-protocol-docs@${{ steps.upstream.outputs.sha }}.
+
+          Upstream-Commit: ${{ steps.upstream.outputs.sha }}
+          Fixer-Commit: ${{ github.sha }}
+          MSG
+
+          git push --force-with-lease origin "$PR_BRANCH"
+
+          if [ -z "$(gh pr list --head "$PR_BRANCH" --state open --json number --jq '.[0].number // empty')" ]; then
+            gh pr create \
+              --base main \
+              --head "$PR_BRANCH" \
+              --title 'chore: bump vendored docs to upstream main' \
+              --body "Bumps the submodule to \`${{ steps.upstream.outputs.sha }}\` and regenerates \`output/json\`.
+
+          \`npm test\` passed, so every override still applies. Review the \`output/json\` diff for
+          protocol changes that need new overrides."
+          fi
+
+  report:
+    needs: [plan, mirror, upstream-main]
+    if: always() && (needs.mirror.result == 'failure' || needs.upstream-main.result == 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summarise the failure
+        run: |
+          {
+            echo '## Sync failed'
+            echo
+            echo "- mirror: ${{ needs.mirror.result }}"
+            echo "- upstream-main: ${{ needs.upstream-main.result }}"
+            echo
+            echo 'A mirror failure is usually a stale override on that branch; see the job log.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1

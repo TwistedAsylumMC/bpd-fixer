@@ -62,6 +62,7 @@ Our own markers get a `+` prefix so they read as a diff over the originals; real
 | Marker | Meaning |
 | ------ | ------- |
 | `+double-optional` | The optional presence header is written twice: `bool + (bool + value-if-true)`. |
+| `+always-set-optional` | The value is framed as an optional but the presence `bool` is always `true`; a `false` header is a malformed packet. |
 
 ## Updating to a new protocol version
 
@@ -72,6 +73,33 @@ npm run build:schemas
 ```
 
 Commit the updated submodule pointer alongside the regenerated `output/json`.
+
+## Automatic upstream sync
+
+`.github/workflows/sync-upstream.yml` tracks [Mojang/bedrock-protocol-docs] on a 6-hourly cron, or on
+demand via **Run workflow**.
+
+- **Every non-default upstream branch** gets a same-named branch here: `main` (our code and overrides)
+  with the submodule repointed at that branch and `output/json` regenerated.
+- **Upstream `main`** opens a PR on `automated/upstream-main` rather than pushing, since a protocol bump
+  is when an override goes stale. If `npm test` fails, the workflow files an issue and opens no PR.
+
+Only branches at `x-protocol-version >= 2168` are mirrored; the format changed there. Branches with no
+`json/` directory are skipped. Both are adjustable via the `min_protocol`, `branch_include` and
+`branch_exclude` inputs.
+
+Mirrors are force-pushed, so each generated commit carries two trailers:
+
+```
+Upstream-Commit: <upstream branch sha it was built from>
+Fixer-Commit:    <our main sha it was built from>
+```
+
+`scripts/plan-sync.mjs` uses them to decide what needs rebuilding — a mirror is stale if either sha has
+moved, so editing an override is enough to trigger one. A tip with no `Upstream-Commit` trailer wasn't
+written by the workflow and is left alone.
+
+[Mojang/bedrock-protocol-docs]: https://github.com/Mojang/bedrock-protocol-docs
 
 ## License
 

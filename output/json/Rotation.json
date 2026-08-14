@@ -15,5 +15,14 @@
         "Clockwise180",
         "CounterClockwise90"
     ],
-    "x-underlying-type": "uint8"
+    "x-underlying-type": "uint8",
+    "x-enum-values": [
+        0,
+        1,
+        2,
+        3,
+        1,
+        2,
+        3
+    ]
 }

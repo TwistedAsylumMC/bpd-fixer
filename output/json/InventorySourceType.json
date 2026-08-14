@@ -13,5 +13,12 @@
         "Creative Inventory",
         "Non Implemented Feature TODO"
     ],
-    "x-underlying-type": "uint32"
+    "x-underlying-type": "uint32",
+    "x-enum-values": [
+        0,
+        1,
+        2,
+        3,
+        99999
+    ]
 }

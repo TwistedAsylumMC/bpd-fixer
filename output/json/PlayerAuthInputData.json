@@ -9,6 +9,7 @@
     "enum": [
         "Ascend",
         "Descend",
+        "NorthJump",
         "JumpDown",
         "SprintDown",
         "ChangeHeight",
@@ -60,6 +61,8 @@
         "DownLeft",
         "DownRight",
         "StartUsingItem",
+        "IsCameraRelativeMovementEnabled",
+        "IsRotControlledByMoveDirection",
         "StartSpinAttack",
         "StopSpinAttack",
         "IsHotbarOnlyTouch",

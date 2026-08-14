@@ -15,5 +15,14 @@
         "Spectator",
         "WorldDefault"
     ],
-    "x-underlying-type": "int32"
+    "x-underlying-type": "int32",
+    "x-enum-values": [
+        -1,
+        0,
+        1,
+        2,
+        5,
+        6,
+        0
+    ]
 }

@@ -11,5 +11,10 @@
         "Snappy",
         "None"
     ],
-    "x-underlying-type": "uint16"
+    "x-underlying-type": "uint16",
+    "x-enum-values": [
+        0,
+        1,
+        65535
+    ]
 }

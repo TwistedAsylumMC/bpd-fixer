@@ -5,6 +5,7 @@
  * add one line here. Files without an entry are passed through byte-for-byte.
  */
 import type { Override } from './types.js';
+import { enumValueOverrides } from './enumValueOverride.js';
 import ArrowDataPayload from './schemas/ArrowDataPayload.js';
 import AuthorAndMessage from './schemas/AuthorAndMessage.js';
 import AvailableCommandsPacketChainedSubcommandData from './schemas/AvailableCommandsPacketChainedSubcommandData.js';
@@ -22,13 +23,16 @@ import CameraSplineDefinition from './schemas/CameraSplineDefinition.js';
 import ChangeDimensionPacketPayload from './schemas/ChangeDimensionPacketPayload.js';
 import ClientCameraAimAssistPacketPayload from './schemas/ClientCameraAimAssistPacketPayload.js';
 import ClientMovementPredictionSyncPacketPayload from './schemas/ClientMovementPredictionSyncPacketPayload.js';
+import ClientPlayMode from './schemas/ClientPlayMode.js';
 import CommandBlockUpdatePacketPayload from './schemas/CommandBlockUpdatePacketPayload.js';
 import CommandOriginData from './schemas/CommandOriginData.js';
 import CommandOutput from './schemas/CommandOutput.js';
 import CommandOutputMessage from './schemas/CommandOutputMessage.js';
+import ContainerEnumName from './schemas/ContainerEnumName.js';
 import EducationLevelSettings from './schemas/EducationLevelSettings.js';
 import FullContainerName from './schemas/FullContainerName.js';
 import GraphicsParameterOverridePacketPayload from './schemas/GraphicsParameterOverridePacketPayload.js';
+import InputMode from './schemas/InputMode.js';
 import InventorySource from './schemas/InventorySource.js';
 import InventoryTransaction from './schemas/InventoryTransaction.js';
 import InventoryTransactionPacketPayload from './schemas/InventoryTransactionPacketPayload.js';
@@ -40,6 +44,7 @@ import MessageAndParams from './schemas/MessageAndParams.js';
 import MessageOnly from './schemas/MessageOnly.js';
 import ModalFormResponsePacketPayload from './schemas/ModalFormResponsePacketPayload.js';
 import PartyChangedPacketPayload from './schemas/PartyChangedPacketPayload.js';
+import PlayerAuthInputData from './schemas/PlayerAuthInputData.js';
 import PlayerAuthInputPacketPayload from './schemas/PlayerAuthInputPacketPayload.js';
 import PlayerListAddEntry from './schemas/PlayerListAddEntry.js';
 import PlayerListPacketPayload from './schemas/PlayerListPacketPayload.js';
@@ -60,6 +65,9 @@ import UpdateClientOptionsPacketPayload from './schemas/UpdateClientOptionsPacke
 import gatheringsConfig from './schemas/gatheringsConfig.js';
 
 export const overrides: Record<string, Override> = {
+  // Enums whose numeric values aren't their ordinals; see `enumValues.ts`.
+  ...enumValueOverrides,
+
   'ArrowDataPayload.json': ArrowDataPayload,
   'AuthorAndMessage.json': AuthorAndMessage,
   'AvailableCommandsPacketChainedSubcommandData.json': AvailableCommandsPacketChainedSubcommandData,
@@ -77,13 +85,16 @@ export const overrides: Record<string, Override> = {
   'ChangeDimensionPacketPayload.json': ChangeDimensionPacketPayload,
   'ClientCameraAimAssistPacketPayload.json': ClientCameraAimAssistPacketPayload,
   'ClientMovementPredictionSyncPacketPayload.json': ClientMovementPredictionSyncPacketPayload,
+  'ClientPlayMode.json': ClientPlayMode,
   'CommandBlockUpdatePacketPayload.json': CommandBlockUpdatePacketPayload,
   'CommandOriginData.json': CommandOriginData,
   'CommandOutput.json': CommandOutput,
   'CommandOutputMessage.json': CommandOutputMessage,
+  'ContainerEnumName.json': ContainerEnumName,
   'EducationLevelSettings.json': EducationLevelSettings,
   'FullContainerName.json': FullContainerName,
   'GraphicsParameterOverridePacketPayload.json': GraphicsParameterOverridePacketPayload,
+  'InputMode.json': InputMode,
   'InventorySource.json': InventorySource,
   'InventoryTransaction.json': InventoryTransaction,
   'InventoryTransactionPacketPayload.json': InventoryTransactionPacketPayload,
@@ -95,6 +106,7 @@ export const overrides: Record<string, Override> = {
   'MessageOnly.json': MessageOnly,
   'ModalFormResponsePacketPayload.json': ModalFormResponsePacketPayload,
   'PartyChangedPacketPayload.json': PartyChangedPacketPayload,
+  'PlayerAuthInputData.json': PlayerAuthInputData,
   'PlayerAuthInputPacketPayload.json': PlayerAuthInputPacketPayload,
   'PlayerListAddEntry.json': PlayerListAddEntry,
   'PlayerListPacketPayload.json': PlayerListPacketPayload,

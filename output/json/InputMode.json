@@ -11,6 +11,7 @@
         "Mouse",
         "Touch",
         "GamePad",
+        "MotionController",
         "Count"
     ],
     "x-underlying-type": "uint32"

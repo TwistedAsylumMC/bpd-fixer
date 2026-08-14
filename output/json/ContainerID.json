@@ -17,5 +17,16 @@
         "CONTAINER_ID_PLAYER_ONLY_UI",
         "CONTAINER_ID_REGISTRY"
     ],
-    "x-underlying-type": "int8"
+    "x-underlying-type": "int8",
+    "x-enum-values": [
+        -1,
+        0,
+        1,
+        100,
+        119,
+        120,
+        122,
+        124,
+        125
+    ]
 }

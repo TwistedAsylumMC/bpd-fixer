@@ -12,5 +12,11 @@
         "DownloadingFinished",
         "ResourcePackStackFinished"
     ],
-    "x-underlying-type": "int8"
+    "x-underlying-type": "int8",
+    "x-enum-values": [
+        1,
+        2,
+        3,
+        4
+    ]
 }

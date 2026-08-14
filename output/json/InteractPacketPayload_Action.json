@@ -13,5 +13,12 @@
         "NpcOpen",
         "OpenInventory"
     ],
-    "x-underlying-type": "uint8"
+    "x-underlying-type": "uint8",
+    "x-enum-values": [
+        0,
+        3,
+        4,
+        5,
+        6
+    ]
 }

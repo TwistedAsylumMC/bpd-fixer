@@ -10,5 +10,9 @@
         "Unknown",
         "PacketMalformed"
     ],
-    "x-underlying-type": "int32"
+    "x-underlying-type": "int32",
+    "x-enum-values": [
+        -1,
+        0
+    ]
 }

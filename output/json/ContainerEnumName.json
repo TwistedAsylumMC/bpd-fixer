@@ -25,9 +25,6 @@
         "RecipeConstructionContainer",
         "RecipeNatureContainer",
         "RecipeItemsContainer",
-        "RecipeFoodContainer",
-        "RecipeBlocksContainer",
-        "RecipeFurnaceItemsContainer",
         "RecipeSearchContainer",
         "RecipeSearchBarContainer",
         "RecipeEquipmentContainer",
@@ -73,7 +70,10 @@
         "CreatedOutputContainer",
         "SmithingTableTemplateContainer",
         "CrafterLevelEntityContainer",
-        "DynamicContainer"
+        "DynamicContainer",
+        "RecipeFoodContainer",
+        "RecipeBlocksContainer",
+        "RecipeFurnaceItemsContainer"
     ],
     "x-underlying-type": "uint8"
 }

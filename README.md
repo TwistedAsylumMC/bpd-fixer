@@ -8,6 +8,7 @@ Output stays near-identical to upstream, so community tooling (such as the `bedr
 
 - Fields marked `required` that are actually optional, and vice versa.
 - Wire-encoding quirks that plain JSON Schema can't express, such as the *double-write* bug where an optional value is serialized as `bool + (bool + value-if-true)` instead of `bool + value-if-true`.
+- Enum members whose numeric value isn't their position in the list, plus members missing from it entirely.
 - Unclear field names and descriptions.
 
 ## Getting started
@@ -64,6 +65,25 @@ Our own markers get a `+` prefix so they read as a diff over the originals; real
 | `+double-optional` | The optional presence header is written twice: `bool + (bool + value-if-true)`. |
 | `+always-set-optional` | The value is framed as an optional but the presence `bool` is always `true`; a `false` header is a malformed packet. |
 
+### Enum values
+
+Upstream publishes enums as bare draft-07 string lists with no numeric values, so the only value a consumer can infer is the member's index. Some enums have retired values, sentinels (`Unknown = -1`), aliases, and values well outside the ordinal range (`ActorType` reaches 16777999).
+
+Where the fix is just inserting members Mojang omitted, or sorting the list into value order, we do that and the list stays a plain 0..n-1 run.
+
+The rest can't be expressed that way, so those files gain an `x-enum-values` array positionally aligned with `enum`:
+
+```json
+{
+  "type": "string",
+  "enum": ["Invalid", "StopRiding", "InteractUpdate", "NpcOpen", "OpenInventory"],
+  "x-enum-values": [0, 3, 4, 5, 6],
+  "x-underlying-type": "uint8"
+}
+```
+
+Index-based consumers see an unchanged member list; value-aware ones get the truth. The values live in `src/overrides/enumValues.ts` as one table rather than 27 near-identical override files, and `enumValueOverride.ts` turns each entry into a registered override. If Mojang's member count moves, the build throws, same fail-loud contract as the field ops.
+
 ## Updating to a new protocol version
 
 ```bash
@@ -95,7 +115,7 @@ Upstream-Commit: <upstream branch sha it was built from>
 Fixer-Commit:    <our main sha it was built from>
 ```
 
-`scripts/plan-sync.mjs` uses them to decide what needs rebuilding — a mirror is stale if either sha has
+`scripts/plan-sync.mjs` uses them to decide what needs rebuilding, a mirror is stale if either sha has
 moved, so editing an override is enough to trigger one. A tip with no `Upstream-Commit` trailer wasn't
 written by the workflow and is left alone.
 

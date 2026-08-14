@@ -13,5 +13,12 @@
         "TOTAL_OPERANDS",
         "OPERAND_INVALID"
     ],
-    "x-underlying-type": "int32"
+    "x-underlying-type": "int32",
+    "x-enum-values": [
+        0,
+        1,
+        2,
+        3,
+        3
+    ]
 }

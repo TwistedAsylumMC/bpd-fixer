@@ -10,7 +10,12 @@
         "Normal",
         "Teaser",
         "Screen",
+        "Viewer",
+        "Reality",
+        "Placement",
+        "LivingRoom",
         "ExitLevel",
+        "ExitLevelLivingRoom",
         "NumModes"
     ],
     "x-underlying-type": "uint32"

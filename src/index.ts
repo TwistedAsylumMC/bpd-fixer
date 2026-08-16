@@ -35,6 +35,24 @@ const results = generate(inputDir);
 const overridden = results.filter((r) => r.overridden);
 const ruledOnly = results.filter((r) => r.ruled && !r.overridden && r.changed);
 const changed = results.filter((r) => r.changed);
+const skipped = results.filter((r) => r.skipped);
+const redundant = results.filter((r) => r.redundant);
+
+// Skips are expected on mirrored branches, not a failure. They are printed on
+// every run (including --check) so a fix quietly not applying is visible.
+const reportSkips = () => {
+  if (skipped.length === 0) return;
+  console.log(`\n${skipped.length} override(s) not applied at this protocol version:`);
+  for (const r of skipped) console.log(`  - ${r.fileName}: ${r.skipped}`);
+};
+
+// Partly-stale overrides: still doing something, but upstream has caught up on
+// part of what they correct, so the `reason` no longer describes all of it.
+const reportRedundant = () => {
+  if (redundant.length === 0) return;
+  console.log(`\n${redundant.length} override(s) with ops upstream has already applied:`);
+  for (const r of redundant) console.log(`  - ${r.fileName}: ${r.redundant!.join(', ')}`);
+};
 
 if (check) {
   const drift: string[] = [];
@@ -47,6 +65,8 @@ if (check) {
     `Checked ${results.length} files, ${overridden.length} override(s), ` +
       `${ruledOnly.length} rule-only change(s), ${changed.length} changed vs upstream.`,
   );
+  reportSkips();
+  reportRedundant();
   if (drift.length > 0) {
     console.error(`\n${drift.length} file(s) differ from committed ${outputDir} (run: npm run build:schemas):`);
     for (const f of drift.slice(0, 50)) console.error('  ' + f);
@@ -61,6 +81,8 @@ if (check) {
     `Wrote ${results.length} files to ${outputDir}, ${overridden.length} override(s), ` +
       `${ruledOnly.length} rule-only change(s), ${changed.length} changed vs upstream.`,
   );
+  reportSkips();
+  reportRedundant();
   for (const r of changed) {
     const tag = r.overridden ? (r.reason ?? 'override') : 'rule';
     console.log(`\n• ${r.fileName}: ${tag}`);

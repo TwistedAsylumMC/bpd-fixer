@@ -54,6 +54,40 @@ If an override references a field the upstream schema no longer has, the run thr
 | `serializationOptions` | Append option string(s) to `x-serialization-options`. |
 | `transform` | Escape hatch for arbitrary reshaping; runs last. |
 
+### Protocol versions
+
+`output/json` is built for whatever the submodule points at, and the sync workflow builds `main` against every upstream branch at protocol >= 2168. An override written against the newest docs is therefore applied to older branches too. Two things scope that.
+
+**Version bounds.** `minProtocol` and `maxProtocol` are both inclusive and both optional. Omitting them, the default, means the fix applies everywhere and carries forward to protocol versions that don't exist yet. Set a bound only when a later version needs a genuinely *different* fix, then register an array of variants:
+
+```ts
+'BuildPlatform.json': [
+  { maxProtocol: 2169, /* … */ },
+  { minProtocol: 2171, /* … */ },
+],
+```
+
+The first variant whose range covers the schema wins, so list them most-specific first. A version no variant covers is passed through unfixed and reported.
+
+**`expect`.** A precondition on the upstream schema: return a message to abandon the fix, or nothing to proceed. A failed `expect` is not an error; the file is passed through and listed in the run output.
+
+The two catch different things:
+
+- Bounds catch changes invisible in the schema, such as an enum keeping its member names while the values move underneath.
+- `expect` catches shapes a version range can't separate, such as two branches at the same protocol version carrying different member lists.
+
+Both exist because the failure they prevent is silent. `root` and `transform` overwrite whatever is there, so a stale override doesn't error, it rewrites correct upstream data. Field ops are narrower but not immune: they will re-apply a correction Mojang has since published, leaving the `reason` describing a bug that no longer exists.
+
+Most overrides need no `expect`. One is derived from `required`, `patch` and `serializationOptions`, which each declare the state they move the schema to, so the build can check upstream is still in the state the fix corrects. It fires when every readable op is already satisfied, meaning the fix would change nothing. Partly-satisfied overrides still apply, and the dead ops are reported separately.
+
+Write an `expect` by hand only where the ops can't speak for themselves, using the helpers in `src/overrides/expect.ts`:
+
+| Helper | For |
+| ------ | --- |
+| `expectEnumMembers(list, count)` | a `root` that replaces `enum` wholesale; catches members added, renamed or removed |
+| `expectProperty(field, key, before)` | a `patch` that overwrites a concrete value; asserts the value being replaced is the diagnosed one |
+| `expectAbsentProperties(...fields)` | a `transform` that adds properties; declines once Mojang documents them |
+
 ### Wire quirks
 
 Some encodings can't be modeled with standard JSON Schema. Rather than a separate extension, we append documented custom strings to Mojang's existing `x-serialization-options` array (which already carries values like `Compression`), so files stay valid draft-07 and quirks ride the same channel consumers already read.
@@ -82,7 +116,11 @@ The rest can't be expressed that way, so those files gain an `x-enum-values` arr
 }
 ```
 
-Index-based consumers see an unchanged member list; value-aware ones get the truth. The values live in `src/overrides/enumValues.ts` as one table rather than 27 near-identical override files, and `enumValueOverride.ts` turns each entry into a registered override. If Mojang's member count moves, the build throws, same fail-loud contract as the field ops.
+Index-based consumers see an unchanged member list; value-aware ones get the truth. The values live in `src/overrides/enumValues.ts` as one table, and `enumValueOverride.ts` turns each entry into a registered override.
+
+`values` is keyed by member **name**, not position, and may be a superset across protocol versions, so upstream adding, removing or renaming members is absorbed without a code change. `Nx` and `Nintendo` both map to 12; a branch gets whichever it lists. Two things aren't absorbed, by design: a name whose value *changes* between versions needs version-bounded variants, and a name with no known value abandons the fix for that file rather than guessing.
+
+`x-enum-values` is emitted only when it differs from the ordinals, so an enum Mojang already publishes complete and correctly numbered is left byte-identical to upstream.
 
 ## Updating to a new protocol version
 

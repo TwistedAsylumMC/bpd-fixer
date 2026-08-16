@@ -1,9 +1,11 @@
 import type { ObjectSchema } from '../../schema.js';
+import { expectAbsentProperties } from '../expect.js';
 import type { Override } from '../types.js';
 
 const override: Override = {
   reason:
     'spline_type is always written, and the definition ends with two fields the schema omits entirely — the same splineIdentifier/loadFromJson pair that CameraInstruction__SplineInstruction documents.',
+  expect: expectAbsentProperties('splineIdentifier', 'loadFromJson'),
   required: {
     spline_type: true,
   },

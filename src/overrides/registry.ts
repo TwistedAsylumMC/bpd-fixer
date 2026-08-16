@@ -3,6 +3,10 @@
  *
  * To add a fix: create `schemas/<SchemaFileName>.ts` (copy `_TEMPLATE.ts`) and
  * add one line here. Files without an entry are passed through byte-for-byte.
+ *
+ * An entry may be an array of variants when a file needs a different fix at
+ * different protocol versions. The first variant whose `minProtocol`/`maxProtocol`
+ * range covers the schema wins, so list them most-specific first.
  */
 import type { Override } from './types.js';
 import { enumValueOverrides } from './enumValueOverride.js';
@@ -64,7 +68,7 @@ import TimeMarkerData from './schemas/TimeMarkerData.js';
 import UpdateClientOptionsPacketPayload from './schemas/UpdateClientOptionsPacketPayload.js';
 import gatheringsConfig from './schemas/gatheringsConfig.js';
 
-export const overrides: Record<string, Override> = {
+export const overrides: Record<string, Override | Override[]> = {
   // Enums whose numeric values aren't their ordinals; see `enumValues.ts`.
   ...enumValueOverrides,
 

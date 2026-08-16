@@ -12,6 +12,30 @@ import { DOUBLE_OPTIONAL } from '../quirks.js';
 const override: Override = {
   reason: 'One specific sentence on what is wrong upstream and what this fixes.',
 
+  // Protocol range this fix applies to, both inclusive and both optional.
+  // Leave them off unless a *different* fix is needed at a later version: the
+  // default is open-ended, so a fix carries forward and `expect` catches drift.
+  // When you do need two, register an array of variants in ../registry.ts,
+  // most-specific first.
+  minProtocol: 2168,
+  maxProtocol: 2169,
+
+  // Precondition on the upstream schema. Return a message to abandon the fix
+  // (the file is passed through and reported), or nothing to proceed.
+  //
+  // Usually you don't need one: a guard is derived from `required`, `patch` and
+  // `serializationOptions` automatically, and the field ops already throw when a
+  // field they name is gone. Write one by hand only for `root` and `transform`,
+  // which overwrite whatever is there and so can clobber in silence. The helpers
+  // in ../expect.js cover the usual shapes:
+  //
+  //   expect: expectEnumMembers(members, 63),          // root replacing `enum`
+  //   expect: expectProperty('Target', 'x-control-value-type', 'uint32'),
+  //   expect: expectAbsentProperties('splineIdentifier'),
+  expect: (schema) => {
+    if (!Array.isArray((schema as { enum?: unknown }).enum)) return 'no longer an enum';
+  },
+
   // Shallow-merge keys into the schema root. Use for enum-type files (which have
   // no `properties`), e.g. fixing a top-level x-underlying-type or `enum`.
   root: {

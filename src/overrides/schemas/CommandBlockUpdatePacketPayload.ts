@@ -1,9 +1,11 @@
 import type { ObjectSchema } from '../../schema.js';
+import { expectProperty } from '../expect.js';
 import type { Override } from '../types.js';
 
 const override: Override = {
   reason:
     'The Target variant tag is a single bool (false selects EntityCommandTarget, true BlockCommandData), not a compressed uint32.',
+  expect: expectProperty('Target', 'x-control-value-type', 'uint32'),
   patch: {
     Target: { 'x-control-value-type': 'boolean' },
   },

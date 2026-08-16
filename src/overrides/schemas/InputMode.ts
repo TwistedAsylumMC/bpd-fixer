@@ -1,3 +1,4 @@
+import { expectEnumMembers } from '../expect.js';
 import type { Override } from '../types.js';
 
 /**
@@ -7,18 +8,19 @@ import type { Override } from '../types.js';
  *
  * Values cross-checked against EndstoneMC/protocol-docs @ r26_u4.
  */
+const members = [
+  'Undefined', // 0
+  'Mouse', // 1
+  'Touch', // 2
+  'GamePad', // 3
+  'MotionController', // 4 (missing upstream)
+  'Count', // 5
+];
+
 const override: Override = {
   reason: 'Missing MotionController (4); Count is 5, not 4.',
-  root: {
-    enum: [
-      'Undefined', // 0
-      'Mouse', // 1
-      'Touch', // 2
-      'GamePad', // 3
-      'MotionController', // 4 (missing upstream)
-      'Count', // 5
-    ],
-  },
+  expect: expectEnumMembers(members, 5),
+  root: { enum: members },
 };
 
 export default override;

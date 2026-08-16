@@ -3,6 +3,7 @@ import path from 'node:path';
 import { parseSchema, serializeSchema } from './util/json.js';
 import { overrides } from './overrides/registry.js';
 import { applyOverride } from './overrides/ops.js';
+import { resolveOverride } from './overrides/resolve.js';
 import { rules } from './rules.js';
 
 /** Files copied without parsing */
@@ -18,6 +19,17 @@ export interface FileResult {
   changed: boolean;
   /** The override's `reason`, when present. */
   reason?: string;
+  /**
+   * Why a registered override was deliberately not applied — the protocol version
+   * falls outside every variant, or the variant's `expect` didn't hold. The file
+   * is passed through unfixed.
+   */
+  skipped?: string;
+  /**
+   * Ops upstream has already applied, on an override that still does something
+   * else. Not an error, but the `reason` is drifting out of date.
+   */
+  redundant?: string[];
   /** Upstream content (for diffing/reporting). */
   input: string;
   /** Corrected content to write. */
@@ -44,16 +56,24 @@ export function generate(inputDir: string): FileResult[] {
     let ruled = false;
     for (const rule of rules) if (rule.apply(schema, fileName)) ruled = true;
 
-    const override = overrides[fileName];
-    const result = override ? applyOverride(schema, override, fileName) : schema;
+    const resolution = resolveOverride(overrides[fileName], schema);
+    const result =
+      resolution.kind === 'apply'
+        ? applyOverride(schema, resolution.override, fileName)
+        : schema;
 
     const content = serializeSchema(result);
     results.push({
       fileName,
-      overridden: Boolean(override),
+      overridden: resolution.kind === 'apply',
       ruled,
       changed: content !== input,
-      reason: override?.reason,
+      reason: resolution.kind === 'apply' ? resolution.override.reason : undefined,
+      skipped: resolution.kind === 'skip' ? resolution.why : undefined,
+      redundant:
+        resolution.kind === 'apply' && resolution.redundant.length > 0
+          ? resolution.redundant
+          : undefined,
       input,
       content,
     });
